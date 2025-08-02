@@ -89,8 +89,15 @@ export async function POST(request) {
       totalCards: cards.length,
       studyStats: {
         totalReviews: 0,
-        correctAnswers: 0,
-        averageScore: 0
+        totalCorrect: 0,
+        totalIncorrect: 0,
+        overallAccuracy: 0,
+        lastAccuracy: 0,
+        lastCorrect: 0,
+        lastIncorrect: 0,
+        lastStudied: null,
+        createdAt: new Date(),
+        updatedAt: new Date()
       }
     };
 

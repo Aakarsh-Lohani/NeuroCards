@@ -62,8 +62,15 @@ export default function FlashcardPreview({ cards, title, isGenerating }) {
             updatedAt: new Date().toISOString(),
             studyStats: {
               totalReviews: 0,
-              correctAnswers: 0,
-              averageScore: 0
+              totalCorrect: 0,
+              totalIncorrect: 0,
+              overallAccuracy: 0,
+              lastAccuracy: 0,
+              lastCorrect: 0,
+              lastIncorrect: 0,
+              lastStudied: null,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString()
             }
           };
           

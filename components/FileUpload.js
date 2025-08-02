@@ -6,6 +6,7 @@ export default function FileUpload({ onCardsGenerated, isGenerating, setIsGenera
   const [textInput, setTextInput] = useState('');
   const [title, setTitle] = useState('');
   const [uploadType, setUploadType] = useState('text');
+  const [youtubeUrl, setYoutubeUrl] = useState('');
   const fileInputRef = useRef(null);
 
   const handleTextSubmit = async () => {
@@ -28,11 +29,113 @@ export default function FileUpload({ onCardsGenerated, isGenerating, setIsGenera
       const text = await file.text();
       await generateFlashcards(text, fileName);
     } else if (file.type === 'application/pdf') {
-      alert('PDF support coming soon! Please copy and paste the text for now.');
+      await handlePdfUpload(file, fileName);
     } else if (file.type.startsWith('image/')) {
-      alert('Image OCR coming soon! Please copy and paste the text for now.');
+      await handleImageUpload(file, fileName);
     } else {
-      alert('Unsupported file type. Please use text files or copy/paste content.');
+      alert('Unsupported file type. Please use text files, PDFs, or images.');
+    }
+  };
+
+  const handlePdfUpload = async (file, fileName) => {
+    try {
+      setIsGenerating(true);
+      
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('fileType', 'pdf');
+      
+      const response = await fetch('/api/extract-text', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to process PDF');
+      }
+      
+      if (data.success && data.text) {
+        await generateFlashcards(data.text, fileName);
+      } else {
+        throw new Error('No text extracted from PDF');
+      }
+    } catch (error) {
+      console.error('PDF processing error:', error);
+      alert(`PDF Error: ${error.message}`);
+      setIsGenerating(false);
+    }
+  };
+
+  const handleImageUpload = async (file, fileName) => {
+    try {
+      setIsGenerating(true);
+      
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('fileType', 'image');
+      
+      const response = await fetch('/api/extract-text', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to process image');
+      }
+      
+      if (data.success && data.text) {
+        await generateFlashcards(data.text, fileName);
+      } else {
+        throw new Error('No text extracted from image');
+      }
+    } catch (error) {
+      console.error('Image processing error:', error);
+      alert(`Image OCR Error: ${error.message}`);
+      setIsGenerating(false);
+    }
+  };
+
+  const handleYoutubeSubmit = async () => {
+    if (!youtubeUrl.trim()) {
+      alert('Please enter a YouTube URL');
+      return;
+    }
+
+    try {
+      setIsGenerating(true);
+      
+      const response = await fetch('/api/process-youtube', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          videoUrl: youtubeUrl.trim()
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to process YouTube video');
+      }
+
+      if (data.success && data.text) {
+        // Extract video title from URL or use default
+        const videoTitle = title || 'YouTube Video Flashcards';
+        await generateFlashcards(data.text, videoTitle);
+      } else {
+        throw new Error('No transcript extracted from video');
+      }
+
+    } catch (error) {
+      console.error('YouTube processing error:', error);
+      alert(`YouTube Error: ${error.message}`);
+      setIsGenerating(false);
     }
   };
 
@@ -151,7 +254,10 @@ export default function FileUpload({ onCardsGenerated, isGenerating, setIsGenera
                 Click to upload or drag and drop
               </p>
               <p className="text-sm text-gray-500 mb-4">
-                Supported: Text files, PDFs, Images
+                ✅ <strong>Text files</strong> (.txt) - Direct text extraction<br/>
+                ✅ <strong>PDF documents</strong> (.pdf) - AI-powered text parsing<br/>
+                ✅ <strong>Images</strong> (.jpg, .png, .gif) - OCR text recognition<br/>
+                <span className="text-orange-600">💡 For best PDF results, use text-based PDFs (not scanned images)</span>
               </p>
               <button
                 onClick={() => fileInputRef.current?.click()}
@@ -170,11 +276,13 @@ export default function FileUpload({ onCardsGenerated, isGenerating, setIsGenera
             </label>
             <input
               type="url"
+              value={youtubeUrl}
+              onChange={(e) => setYoutubeUrl(e.target.value)}
               placeholder="Paste YouTube or video URL here..."
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 text-gray-900 placeholder-gray-500"
             />
             <div className="mt-2 text-sm text-gray-500">
-              Video transcription coming soon! Please use text input for now.
+              Supports YouTube videos with captions. The AI will extract transcript automatically.
             </div>
           </div>
         )}
@@ -182,10 +290,14 @@ export default function FileUpload({ onCardsGenerated, isGenerating, setIsGenera
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          onClick={handleTextSubmit}
-          disabled={isGenerating || (uploadType === 'text' && !textInput.trim())}
+          onClick={uploadType === 'url' ? handleYoutubeSubmit : handleTextSubmit}
+          disabled={isGenerating || 
+            (uploadType === 'text' && !textInput.trim()) || 
+            (uploadType === 'url' && !youtubeUrl.trim())}
           className={`w-full py-4 font-semibold rounded-xl transition-all duration-300 ${
-            isGenerating || (uploadType === 'text' && !textInput.trim())
+            isGenerating || 
+            (uploadType === 'text' && !textInput.trim()) || 
+            (uploadType === 'url' && !youtubeUrl.trim())
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
               : 'bg-gradient-to-r from-orange-500 to-pink-500 text-white hover:from-orange-600 hover:to-pink-600 shadow-lg hover:shadow-xl'
           }`}
@@ -193,12 +305,20 @@ export default function FileUpload({ onCardsGenerated, isGenerating, setIsGenera
           {isGenerating ? (
             <div className="flex items-center justify-center space-x-2">
               <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full"></div>
-              <span>Generating Flashcards...</span>
+              <span>
+                {uploadType === 'url' ? 'Processing Video...' : 
+                 uploadType === 'file' ? 'Processing File...' : 
+                 'Generating Flashcards...'}
+              </span>
             </div>
           ) : (
             <div className="flex items-center justify-center space-x-2">
               <span>🤖</span>
-              <span>Generate AI Flashcards</span>
+              <span>
+                {uploadType === 'url' ? 'Process YouTube Video' : 
+                 uploadType === 'file' ? 'Process File' : 
+                 'Generate AI Flashcards'}
+              </span>
             </div>
           )}
         </motion.button>
@@ -209,8 +329,9 @@ export default function FileUpload({ onCardsGenerated, isGenerating, setIsGenera
             <div>
               <h4 className="font-medium text-blue-800 mb-1">Pro Tip</h4>
               <p className="text-sm text-blue-600">
-                For best results, provide well-structured content with clear concepts. 
-                The AI works better with educational material, definitions, and explanatory text.
+                ✨ <strong>Now supports multiple formats:</strong> Upload PDFs, extract text from images using OCR, 
+                or process YouTube videos with captions. For best results, provide well-structured content 
+                with clear concepts and educational material.
               </p>
             </div>
           </div>

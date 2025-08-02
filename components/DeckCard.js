@@ -94,13 +94,13 @@ export default function DeckCard({ deck, onDelete }) {
           </div>
           <div className="p-2 bg-blue-50 rounded-lg">
             <div className="text-lg font-bold text-blue-600">
-              {Math.round(deck.studyStats?.averageScore || 0)}%
+              {deck.studyStats?.overallAccuracy || deck.studyStats?.lastAccuracy || 0}%
             </div>
             <div className="text-xs text-blue-500">Accuracy</div>
           </div>
           <div className="p-2 bg-purple-50 rounded-lg">
             <div className="text-lg font-bold text-purple-600">
-              {deck.studyStats?.correctAnswers || 0}
+              {deck.studyStats?.totalCorrect || 0}
             </div>
             <div className="text-xs text-purple-500">Correct</div>
           </div>

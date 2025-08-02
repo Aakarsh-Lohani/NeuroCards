@@ -5,8 +5,13 @@ export default function StudyStats({ decks }) {
   // Calculate overall stats
   const totalCards = decks.reduce((sum, deck) => sum + (deck.totalCards || 0), 0);
   const totalReviews = decks.reduce((sum, deck) => sum + (deck.studyStats?.totalReviews || 0), 0);
-  const totalCorrect = decks.reduce((sum, deck) => sum + (deck.studyStats?.correctAnswers || 0), 0);
-  const averageAccuracy = totalReviews > 0 ? Math.round((totalCorrect / totalReviews) * 100) : 0;
+  const totalCorrect = decks.reduce((sum, deck) => sum + (deck.studyStats?.totalCorrect || 0), 0);
+  const totalIncorrect = decks.reduce((sum, deck) => sum + (deck.studyStats?.totalIncorrect || 0), 0);
+  
+  // Calculate overall accuracy from correct/incorrect totals
+  const overallAccuracy = (totalCorrect + totalIncorrect) > 0 
+    ? Math.round((totalCorrect / (totalCorrect + totalIncorrect)) * 100) 
+    : 0;
 
   const stats = [
     {
@@ -31,8 +36,8 @@ export default function StudyStats({ decks }) {
       bgColor: 'from-orange-50 to-orange-100'
     },
     {
-      title: 'Accuracy',
-      value: `${averageAccuracy}%`,
+      title: 'Overall Accuracy',
+      value: `${overallAccuracy}%`,
       icon: '🎖️',
       color: 'from-purple-400 to-purple-600',
       bgColor: 'from-purple-50 to-purple-100'
@@ -103,7 +108,7 @@ export default function StudyStats({ decks }) {
             <p className="text-gray-600">
               {totalReviews === 0
                 ? "Create your first deck and start studying with AI-powered flashcards."
-                : `Keep up the momentum and maintain your ${averageAccuracy}% accuracy rate!`
+                : `Keep up the momentum and maintain your ${overallAccuracy}% accuracy rate!`
               }
             </p>
           </div>

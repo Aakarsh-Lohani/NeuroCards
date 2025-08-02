@@ -46,7 +46,7 @@ export default function StudyPage() {
     }
   };
 
-  const handleAnswer = (correct) => {
+  const handleAnswer = async (correct) => {
     setStudyStats(prev => ({
       ...prev,
       correct: correct ? prev.correct + 1 : prev.correct,
@@ -57,7 +57,123 @@ export default function StudyPage() {
     if (currentCardIndex < deck.cards.length - 1) {
       setCurrentCardIndex(currentCardIndex + 1);
     } else {
+      // Study session complete - save statistics
+      const finalStats = {
+        correct: correct ? studyStats.correct + 1 : studyStats.correct,
+        incorrect: correct ? studyStats.incorrect : studyStats.incorrect + 1,
+        total: deck.cards.length
+      };
+      
+      setStudyStats(finalStats);
+      await saveStudyStats(finalStats);
       setStudyComplete(true);
+    }
+  };
+
+  const saveStudyStats = async (finalStats) => {
+    try {
+      console.log('Saving study stats:', finalStats);
+      console.log('Deck ID:', deckId);
+      
+      const requestBody = {
+        deckId: deckId,
+        studyStats: finalStats
+      };
+      
+      console.log('Request body:', JSON.stringify(requestBody));
+      
+      const response = await fetch('/api/save-study-stats', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Response error text:', errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+
+      let data;
+      try {
+        const responseText = await response.text();
+        console.log('Raw response text:', responseText);
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('JSON parsing error:', parseError);
+        throw new Error('Invalid JSON response from server');
+      }
+
+      if (data.success) {
+        console.log('Study stats saved successfully:', data.stats);
+        
+        // If using localStorage fallback, save locally
+        if (data.useLocalStorage) {
+          try {
+            const existingDecks = JSON.parse(localStorage.getItem('neuroCards_decks') || '[]');
+            const updatedDecks = existingDecks.map(localDeck => {
+              if (localDeck._id === deckId) {
+                return {
+                  ...localDeck,
+                  studyStats: {
+                    ...localDeck.studyStats,
+                    lastAccuracy: data.stats.accuracy,
+                    lastCorrect: data.stats.correct,
+                    lastIncorrect: data.stats.incorrect,
+                    lastStudied: new Date().toISOString(),
+                    totalReviews: (localDeck.studyStats?.totalReviews || 0) + 1,
+                    totalCorrect: (localDeck.studyStats?.totalCorrect || 0) + finalStats.correct,
+                    totalIncorrect: (localDeck.studyStats?.totalIncorrect || 0) + finalStats.incorrect
+                  }
+                };
+              }
+              return localDeck;
+            });
+            localStorage.setItem('neuroCards_decks', JSON.stringify(updatedDecks));
+            console.log('Study stats saved to localStorage');
+          } catch (error) {
+            console.error('Error saving to localStorage:', error);
+          }
+        }
+      } else {
+        console.error('Failed to save study stats:', data.error || 'Unknown error');
+        alert('Failed to save study statistics: ' + (data.error || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Error saving study stats:', error);
+      alert('Error saving study statistics: ' + error.message);
+      
+      // Fallback: Save to localStorage if API fails
+      try {
+        const existingDecks = JSON.parse(localStorage.getItem('neuroCards_decks') || '[]');
+        const updatedDecks = existingDecks.map(localDeck => {
+          if (localDeck._id === deckId) {
+            return {
+              ...localDeck,
+              studyStats: {
+                ...localDeck.studyStats,
+                lastAccuracy: Math.round((finalStats.correct / finalStats.total) * 100),
+                lastCorrect: finalStats.correct,
+                lastIncorrect: finalStats.incorrect,
+                lastStudied: new Date().toISOString(),
+                totalReviews: (localDeck.studyStats?.totalReviews || 0) + 1,
+                totalCorrect: (localDeck.studyStats?.totalCorrect || 0) + finalStats.correct,
+                totalIncorrect: (localDeck.studyStats?.totalIncorrect || 0) + finalStats.incorrect
+              }
+            };
+          }
+          return localDeck;
+        });
+        localStorage.setItem('neuroCards_decks', JSON.stringify(updatedDecks));
+        console.log('Study stats saved to localStorage as fallback');
+      } catch (fallbackError) {
+        console.error('Error saving to localStorage fallback:', fallbackError);
+      }
     }
   };
 
