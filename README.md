@@ -138,52 +138,32 @@ NeuroCards follows a modern, clean design inspired by contemporary educational p
 3. **Deploy automatically on every push**
 
 ```bash
-# Or deploy manually
-npm run build
-vercel --prod
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-### Other Platforms
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-The app can be deployed on any platform supporting Next.js applications:
-- Netlify
-- Railway
-- DigitalOcean App Platform
-- AWS Amplify
+You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
 
-## 🤝 Contributing
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-We welcome contributions! Here's how to get started:
+## Learn More
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+To learn more about Next.js, take a look at the following resources:
 
-## 📝 License
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## 🆘 Support
+## Deploy on Vercel
 
-- 📧 **Email**: support@neurocards.app
-- 💬 **Discord**: [Join our community](https://discord.gg/neurocards)
-- 🐛 **Issues**: [GitHub Issues](https://github.com/yourusername/neurocards/issues)
-- 📖 **Documentation**: [docs.neurocards.app](https://docs.neurocards.app)
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-## 🙏 Acknowledgments
-
-- **Hugging Face** for providing free AI inference APIs
-- **MongoDB Atlas** for reliable cloud database hosting
-- **Vercel** for seamless deployment and hosting
-- **Open Source Community** for the amazing tools and libraries
-
----
-
-<div align="center">
-  <p>Made with ❤️ for learners everywhere</p>
-  <p>
-    <a href="#-neurocards---activate-your-memory-muscle">⬆️ Back to Top</a>
-  </p>
-</div>
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
