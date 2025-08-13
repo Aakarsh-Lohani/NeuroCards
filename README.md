@@ -4,7 +4,6 @@ YouTube video : https://youtu.be/JjIqB9FCDt8?si=_7X3-w8EbltheOjB
 
 **NeuroCards** is an AI-powered flashcard application that automatically converts your notes, PDFs, images, and video transcripts into intelligent flashcards and adaptive quizzes using the Hugging Face API.
 
-![NeuroCards Demo](https://via.placeholder.com/800x400/FF6B35/FFFFFF?text=NeuroCards+AI+Flashcards)
 
 ## ✨ Features
 
