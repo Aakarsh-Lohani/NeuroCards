@@ -178,7 +178,7 @@ export default function FileUpload({ onCardsGenerated, isGenerating, setIsGenera
     <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
       <div className="bg-gradient-to-r from-orange-500 to-pink-500 p-6">
         <h2 className="text-2xl font-bold text-white mb-2">Upload Your Content</h2>
-        <p className="text-orange-100">Choose how you'd like to create your flashcards</p>
+        <p className="text-orange-100">Choose how you&apos;d like to create your flashcards</p>
       </div>
 
       <div className="p-8">

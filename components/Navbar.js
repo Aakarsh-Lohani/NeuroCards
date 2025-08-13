@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import React from 'react'
+import Image from 'next/image';
 
 const Navbar = () => {
   return (
@@ -13,9 +14,11 @@ const Navbar = () => {
 
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
         <Link href="/" className="flex items-center space-x-3">
-          <img 
-            src="/NeuroCards.png" 
-            alt="NeuroCards" 
+          <Image
+            src="/NeuroCards.png"
+            alt="NeuroCards"
+            width={40}
+            height={40}
             className="w-10 h-10 rounded-lg object-contain"
           />
           <span className="text-2xl font-black text-gray-900">
