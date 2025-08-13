@@ -22,28 +22,25 @@ export default function FileUpload({ onCardsGenerated, isGenerating, setIsGenera
     const file = event.target.files[0];
     if (!file) return;
 
-    const fileName = file.name.replace(/\.[^/.]+$/, ''); // Remove file extension
+    const fileName = file.name.replace(/\.[^/.]+$/, '');
     setTitle(fileName);
 
-    if (file.type === 'text/plain') {
-      const text = await file.text();
-      await generateFlashcards(text, fileName);
-    } else if (file.type === 'application/pdf') {
-      await handlePdfUpload(file, fileName);
-    } else if (file.type.startsWith('image/')) {
-      await handleImageUpload(file, fileName);
+    let fileType = '';
+    if (file.type === 'application/pdf') {
+      fileType = 'pdf';
+    } else if (file.type === 'text/plain') {
+      fileType = 'text';
     } else {
-      alert('Unsupported file type. Please use text files, PDFs, or images.');
+      alert('Unsupported file type. Please use PDF or TXT files.');
+      return;
     }
-  };
 
-  const handlePdfUpload = async (file, fileName) => {
     try {
       setIsGenerating(true);
       
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('fileType', 'pdf');
+      formData.append('fileType', fileType);
       
       const response = await fetch('/api/extract-text', {
         method: 'POST',
@@ -53,51 +50,27 @@ export default function FileUpload({ onCardsGenerated, isGenerating, setIsGenera
       const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to process PDF');
+        throw new Error(data.error || `Failed to process ${fileType.toUpperCase()} file`);
       }
       
       if (data.success && data.text) {
         await generateFlashcards(data.text, fileName);
       } else {
-        throw new Error('No text extracted from PDF');
+        throw new Error(`No text extracted from ${fileType.toUpperCase()} file`);
       }
     } catch (error) {
-      console.error('PDF processing error:', error);
-      alert(`PDF Error: ${error.message}`);
+      console.error(`${fileType.toUpperCase()} processing error:`, error);
+      alert(`${fileType.toUpperCase()} Error: ${error.message}`);
+    } finally {
       setIsGenerating(false);
     }
   };
 
-  const handleImageUpload = async (file, fileName) => {
-    try {
-      setIsGenerating(true);
-      
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('fileType', 'image');
-      
-      const response = await fetch('/api/extract-text', {
-        method: 'POST',
-        body: formData
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to process image');
-      }
-      
-      if (data.success && data.text) {
-        await generateFlashcards(data.text, fileName);
-      } else {
-        throw new Error('No text extracted from image');
-      }
-    } catch (error) {
-      console.error('Image processing error:', error);
-      alert(`Image OCR Error: ${error.message}`);
-      setIsGenerating(false);
-    }
-  };
+  // Remove the now-redundant handlePdfUpload function
+  // const handlePdfUpload = ...
+
+  // Remove the now-redundant handleImageUpload function
+  // const handleImageUpload = ...
 
   const handleYoutubeSubmit = async () => {
     if (!youtubeUrl.trim()) {
@@ -290,7 +263,11 @@ export default function FileUpload({ onCardsGenerated, isGenerating, setIsGenera
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          onClick={uploadType === 'url' ? handleYoutubeSubmit : handleTextSubmit}
+          onClick={
+            uploadType === 'url' ? handleYoutubeSubmit :
+            uploadType === 'file' ? () => fileInputRef.current?.click() :
+            handleTextSubmit
+          }
           disabled={isGenerating || 
             (uploadType === 'text' && !textInput.trim()) || 
             (uploadType === 'url' && !youtubeUrl.trim())}
