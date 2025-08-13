@@ -124,17 +124,17 @@ export default function FileUpload({ onCardsGenerated, isGenerating, setIsGenera
         throw new Error(data.error || 'Failed to process YouTube video');
       }
 
-      if (data.success && data.text) {
-        // Extract video title from URL or use default
-        const videoTitle = title || 'YouTube Video Flashcards';
-        await generateFlashcards(data.text, videoTitle);
+      if (data.success && data.flashcards && data.flashcards.cards) {
+        const videoTitle = title || data.flashcards.title || 'YouTube Video Flashcards';
+        onCardsGenerated(data.flashcards.cards, videoTitle);
       } else {
-        throw new Error('No transcript extracted from video');
+        throw new Error(data.error || 'Could not extract flashcards from video.');
       }
 
     } catch (error) {
       console.error('YouTube processing error:', error);
       alert(`YouTube Error: ${error.message}`);
+    } finally {
       setIsGenerating(false);
     }
   };
