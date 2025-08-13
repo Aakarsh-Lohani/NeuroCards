@@ -68,7 +68,7 @@ export default function Hero() {
           transition={{ delay: 1, duration: 0.8 }}
           className="mt-16 text-sm text-gray-500"
         >
-          India's most innovative flashcard platform with 10,000+ active learners
+          India&apos;s most innovative flashcard platform with 10,000+ active learners
         </motion.div>
       </div>
     </section>

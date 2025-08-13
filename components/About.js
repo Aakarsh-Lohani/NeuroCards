@@ -21,7 +21,7 @@ export default function About() {
             <p className="text-lg text-gray-700 leading-relaxed mb-8">
               Founded in 2024 by innovative developers, NeuroCards is a cutting-edge platform 
               dedicated to making quality learning accessible for all. With a mission to 
-              empower students through AI-powered education, we've built a vibrant community 
+              empower students through AI-powered education, we&apos;ve built a vibrant community 
               of learners who benefit from our advanced flashcard generation technology.
             </p>
             
@@ -34,7 +34,7 @@ export default function About() {
             </p>
             
             <p className="text-lg text-gray-700 leading-relaxed mb-8">
-              At NeuroCards, every learner's success is our shared mission. Join us in shaping 
+              At NeuroCards, every learner&apos;s success is our shared mission. Join us in shaping 
               a future where AI-powered education is a right—not a privilege—and where everyone 
               can maximize their learning potential.
             </p>
