@@ -121,12 +121,7 @@ export default function DeckCard({ deck, onDelete }) {
           </motion.button>
 
           <div className="flex space-x-2">
-            <button
-              onClick={() => window.location.href = `/edit/${deck._id}`}
-              className="flex-1 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors duration-300"
-            >
-              ✏️ Edit
-            </button>
+            
             <button
               onClick={handleDelete}
               className="flex-1 py-2 bg-red-100 text-red-600 font-medium rounded-lg hover:bg-red-200 transition-colors duration-300"
