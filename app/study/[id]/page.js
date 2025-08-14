@@ -47,27 +47,27 @@ export default function StudyPage() {
   };
 
   const handleAnswer = async (correct) => {
-    setStudyStats(prev => ({
-      ...prev,
-      correct: correct ? prev.correct + 1 : prev.correct,
-      incorrect: correct ? prev.incorrect : prev.incorrect + 1
-    }));
-
-    // Move to next card or complete study
-    if (currentCardIndex < deck.cards.length - 1) {
-      setCurrentCardIndex(currentCardIndex + 1);
-    } else {
-      // Study session complete - save statistics
-      const finalStats = {
-        correct: correct ? studyStats.correct + 1 : studyStats.correct,
-        incorrect: correct ? studyStats.incorrect : studyStats.incorrect + 1,
-        total: deck.cards.length
+    
+    setStudyStats(prevStats => {
+      const newStats = {
+        ...prevStats,
+        correct: correct ? prevStats.correct + 1 : prevStats.correct,
+        incorrect: !correct ? prevStats.incorrect + 1 : prevStats.incorrect,
       };
+
+      // Check if this was the last card
+      if (currentCardIndex >= deck.cards.length - 1) {
+        // Study session is complete, save the new statistics
+        saveStudyStats(newStats);
+        setStudyComplete(true);
+      } else {
+        // Not the last card, just move to the next one
+        setCurrentCardIndex(currentCardIndex + 1);
+      }
       
-      setStudyStats(finalStats);
-      await saveStudyStats(finalStats);
-      setStudyComplete(true);
-    }
+      // Return the new state for the update
+      return newStats;
+    });
   };
 
   const saveStudyStats = async (finalStats) => {
@@ -145,7 +145,6 @@ export default function StudyPage() {
         alert('Failed to save study statistics: ' + (data.error || 'Unknown error'));
       }
     } catch (error) {
-      console.error('Error saving study stats:', error);
       alert('Error saving study statistics: ' + error.message);
       
       // Fallback: Save to localStorage if API fails
@@ -324,7 +323,7 @@ export default function StudyPage() {
           <div className="w-full bg-gray-200 rounded-full h-3 mb-8">
             <div
               className="bg-gradient-to-r from-orange-500 to-pink-500 h-3 rounded-full transition-all duration-500"
-              style={{ width: `${((currentCardIndex) / deck.cards.length) * 100}%` }}
+              style={{ width: `${((currentCardIndex+1) / deck.cards.length) * 100}%` }}
             ></div>
           </div>
 

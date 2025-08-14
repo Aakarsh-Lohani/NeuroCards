@@ -10,15 +10,63 @@ const hf = HF_TOKEN ? new InferenceClient(HF_TOKEN) : null;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 // Fallback models to try in order
-const QG_MODEL = 'doc2query/msmarco-t5-base-v1'; // Switched to a more reliable model for generating questions from text
+const QG_MODEL = 'doc2query/msmarco-t5-base-v1'; 
 const QA_MODELS = [
   'distilbert-base-cased-distilled-squad', // Free-tier QA model
   'deepset/roberta-base-squad2'
 ];
 
+// Gemini-powered content moderation
+async function moderateContentWithGemini(text) {
+    if (!GEMINI_API_KEY) {
+        console.log("No Gemini key, skipping moderation.");
+        return "SAFE"; // If no key, bypass check for now.
+    }
+
+    console.log('Checking content with Gemini moderation...');
+    try {
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-goog-api-key': GEMINI_API_KEY
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: `Analyze the following text for any content policy violations (e.g., hate speech, harassment, violence, self-harm,underage content, harmful content, sexual content, etc.). Respond with only "SAFE" if no violations are found, or "UNSAFE" if violations are present.
+
+                            Text: "${text}"
+
+                            Classification:`
+                        }]
+                    }]
+                })
+            }
+        );
+
+        if (!response.ok) {
+            const errorBody = await response.text();
+            throw new Error(`Gemini moderation API request failed with status ${response.status}: ${errorBody}`);
+        }
+
+        const data = await response.json();
+        const classification = data.candidates[0]?.content?.parts[0]?.text.trim().toUpperCase();
+        
+        console.log(`Gemini moderation result: ${classification}`);
+        return classification === "SAFE" ? "SAFE" : "UNSAFE";
+
+    } catch (error) {
+        console.error('Gemini moderation failed:', error.message);
+        // Fail cautiously. If moderation API fails, we don't process the content.
+        return "UNSAFE"; 
+    }
+}
+
 
 // Rule-based question generation
-
 function generateQuestionsFromText(text) {
   try {
     const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 10);
@@ -213,6 +261,16 @@ export async function POST(request) {
     }
 
     const cleanText = text.trim();
+
+    // Content Moderation Step
+    const moderationResult = await moderateContentWithGemini(cleanText);
+    if (moderationResult !== "SAFE") {
+        return NextResponse.json(
+            { error: 'Content Policy violation detected. The provided text cannot be processed.' },
+            { status: 400 }
+        );
+    }
+
     const cards = await generateQuestionsWithAI(cleanText);
 
     if (!cards || cards.length === 0) {

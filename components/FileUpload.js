@@ -66,12 +66,6 @@ export default function FileUpload({ onCardsGenerated, isGenerating, setIsGenera
     }
   };
 
-  // Remove the now-redundant handlePdfUpload function
-  // const handlePdfUpload = ...
-
-  // Remove the now-redundant handleImageUpload function
-  // const handleImageUpload = ...
-
   const handleYoutubeSubmit = async () => {
     if (!youtubeUrl.trim()) {
       alert('Please enter a YouTube URL');
@@ -219,7 +213,7 @@ export default function FileUpload({ onCardsGenerated, isGenerating, setIsGenera
                 ref={fileInputRef}
                 type="file"
                 onChange={handleFileUpload}
-                accept=".txt,.pdf,image/*"
+                accept=".txt,.pdf"
                 className="hidden"
               />
               <div className="text-4xl mb-4">📎</div>
@@ -229,7 +223,6 @@ export default function FileUpload({ onCardsGenerated, isGenerating, setIsGenera
               <p className="text-sm text-gray-500 mb-4">
                 ✅ <strong>Text files</strong> (.txt) - Direct text extraction<br/>
                 ✅ <strong>PDF documents</strong> (.pdf) - AI-powered text parsing<br/>
-                ✅ <strong>Images</strong> (.jpg, .png, .gif) - OCR text recognition<br/>
                 <span className="text-orange-600">💡 For best PDF results, use text-based PDFs (not scanned images)</span>
               </p>
               <button
@@ -306,7 +299,7 @@ export default function FileUpload({ onCardsGenerated, isGenerating, setIsGenera
             <div>
               <h4 className="font-medium text-blue-800 mb-1">Pro Tip</h4>
               <p className="text-sm text-blue-600">
-                ✨ <strong>Now supports multiple formats:</strong> Upload PDFs, extract text from images using OCR, 
+                ✨ <strong>Now supports multiple formats:</strong> Upload PDFs, 
                 or process YouTube videos with captions. For best results, provide well-structured content 
                 with clear concepts and educational material.
               </p>

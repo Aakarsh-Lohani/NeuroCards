@@ -25,7 +25,7 @@ const Navbar = () => {
             <span className="text-orange-500">Neuro</span>Cards
           </span>
         </Link>
-        
+
         <div className="hidden md:flex items-center space-x-8">
           <Link href="#features" className="text-gray-700 hover:text-orange-600 font-medium transition-colors duration-200">
             Features
@@ -36,17 +36,16 @@ const Navbar = () => {
           <Link href="/dashboard" className="text-gray-700 hover:text-orange-600 font-medium transition-colors duration-200">
             Dashboard
           </Link>
-          <Link href="/create" className="text-gray-700 hover:text-orange-600 font-medium transition-colors duration-200">
-            Create
-          </Link>
-          <Link 
-            href="/create" 
+          <Link href="/documentation" className="text-gray-600 hover:text-orange-500 transition-colors duration-300 font-medium">Documentation</Link>
+          <a href="https://github.com/Aakarsh-Lohani/NeuroCards" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-orange-500 transition-colors duration-300 font-medium">Github</a>
+          <Link
+            href="/create"
             className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-semibold rounded-full hover:from-orange-600 hover:to-pink-600 transform hover:scale-105 transition-all duration-300 shadow-md hover:shadow-lg"
           >
             Get Started
           </Link>
         </div>
-        
+
         {/* Mobile menu button */}
         <div className="md:hidden">
           <button className="text-gray-700 hover:text-orange-600">

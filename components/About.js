@@ -85,7 +85,7 @@ export default function About() {
                     color: 'from-emerald-400 to-teal-400'
                   },
                   { 
-                    tech: 'Hugging Face AI', 
+                    tech: 'Hugging Face AI and Gemini API', 
                     desc: 'Zero-cost AI flashcard generation',
                     icon: '🤖',
                     color: 'from-purple-400 to-pink-400'
